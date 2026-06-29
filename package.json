@@ -1,0 +1,24 @@
+{
+  "name": "my-ext-md-render",
+  "version": "1.0.0",
+  "description": "右クリックで表示中のテキストをMarkdownとしてレンダリングするChromium拡張（手動トリガ・ローカル完結）",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:js": "esbuild src/render-entry.js --bundle --minify --format=iife --target=es2018 --outfile=ext/render.bundle.js",
+    "build:css": "node scripts/build-css.mjs",
+    "build": "npm run build:js && npm run build:css",
+    "test": "node test/render.test.mjs",
+    "package": "npm run build && cd ext && zip -rq ../my-ext-md-render.zip .",
+    "clean": "rm -f ext/render.bundle.js ext/vendor/github-markdown.css ext/vendor/hljs-github.css my-ext-md-render.zip"
+  },
+  "keywords": ["markdown", "browser-extension", "chromium", "brave"],
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "github-markdown-css": "^5.9.0",
+    "highlight.js": "^11.11.1",
+    "jsdom": "^29.1.1",
+    "markdown-it": "^14.2.0"
+  }
+}

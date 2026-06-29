@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "My Markdown Render (tamano)",
+  "version": "1.0.0",
+  "description": "右クリックまたはツールバーから、表示中のテキストをMarkdownとしてレンダリングします（ローカル完結）。",
+  "permissions": ["contextMenus", "scripting", "activeTab"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Markdownとしてレンダリング" }
+}
