@@ -3,8 +3,12 @@
 // host permissions are needed.
 
 const MENU_ID = 'render-as-markdown';
+// Chrome sorts top-level context-menu items from different extensions by their
+// title text, so changing this item's title moves it relative to other
+// extensions' items. Keep both labels on the same leading "Markdown" sort key
+// so the item stays in a stable slot whichever state it's in.
 const RENDER_TITLE = 'Markdownとしてレンダリング';
-const RESTORE_TITLE = '元のテキストに戻す';
+const RESTORE_TITLE = 'Markdown表示を元に戻す';
 const CSS_FILES = [
   'vendor/github-markdown.css',
   'vendor/hljs-github.css',
