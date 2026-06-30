@@ -27,8 +27,12 @@ ext/                         ← unpacked で読み込む対象フォルダ
     layout.css               [source] レイアウト（横幅・余白・背景）
     github-markdown.css       [generated] github-markdown-css をコピー（gitignore）
     hljs-github.css           [generated] hljs github テーマ light/dark 合成（gitignore）
+  icons/
+    icon.svg                 [source] アイコン原本（SVG）
+    icon-{16,32,48,128}.png  [generated] icon.svg をラスタライズ（gitignore）
 src/render-entry.js          [source] 注入されるレンダリング本体
 scripts/build-css.mjs        [source] vendor CSS 生成スクリプト
+scripts/build-icons.mjs      [source] icon.svg → PNG 生成スクリプト
 test/render.test.mjs         [source] スモークテスト
 ```
 
@@ -47,6 +51,7 @@ test/render.test.mjs         [source] スモークテスト
 
 - **対応言語を追加:** `src/render-entry.js` の `langs` に `name: () => require('highlight.js/lib/languages/<lang>')` を追記し、必要ならエイリアスも登録 → `npm run build`。
 - **スタイル調整:** 横幅・余白・背景は `ext/vendor/layout.css`（source）。テーマ差し替えは `scripts/build-css.mjs` を編集。
+- **アイコン変更:** `ext/icons/icon.svg`（source）を編集 → `npm run build`（または `npm run build:icons`）で PNG を再生成。サイズを増やすなら `scripts/build-icons.mjs` の `SIZES` と `manifest.json` の `icons` / `action.default_icon` を更新。ラスタライズは `@resvg/resvg-js`（プリビルド同梱・オフライン）でローカル完結を維持。
 - **markdown-it プラグイン追加（例: task list, footnote）:** `src/render-entry.js` で `md.use(...)`。依存は `devDependencies` に入れてバンドルに含める。
 
 ## 制限事項

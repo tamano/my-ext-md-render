@@ -5,6 +5,11 @@ node_modules/
 ext/render.bundle.js
 ext/vendor/github-markdown.css
 ext/vendor/hljs-github.css
+# Generated icon PNGs (source is ext/icons/icon.svg)
+ext/icons/icon-16.png
+ext/icons/icon-32.png
+ext/icons/icon-48.png
+ext/icons/icon-128.png
 
 # Packaged extension
 *.zip

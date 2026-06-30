@@ -37,13 +37,15 @@ URL が `.md` でなくても、Content-Type が `text/plain` でも関係なく
 
 ## カスタマイズ
 
-- ビルド: `npm install && npm run build`（`ext/render.bundle.js` と vendor CSS を生成）
+- ビルド: `npm install && npm run build`（`ext/render.bundle.js` / vendor CSS / アイコン PNG を生成）
 - 対応言語を増やす: `src/render-entry.js` の `langs` に追記し、`npm run build`
 - スタイル変更: `ext/vendor/layout.css`（横幅・余白）、テーマCSSは `scripts/build-css.mjs`
+- アイコン変更: `ext/icons/icon.svg` を編集し、`npm run build`（PNG を再生成）
 - テスト: `npm test`（jsdom スモークテスト）
 
-> 注意: `ext/render.bundle.js` と `ext/vendor/github-markdown.css` / `hljs-github.css` は
-> ビルド生成物で `.gitignore` 済みです。`git clone` 直後はロード前に `npm install && npm run build` を実行してください。
+> 注意: `ext/render.bundle.js`、`ext/vendor/github-markdown.css` / `hljs-github.css`、
+> `ext/icons/icon-*.png` はビルド生成物で `.gitignore` 済みです。`git clone` 直後はロード前に
+> `npm install && npm run build` を実行してください（アイコン PNG が無いとツールバーに表示されません）。
 
 ## 制限事項
 
