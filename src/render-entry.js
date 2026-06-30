@@ -73,6 +73,11 @@ function render() {
   const source = getSourceText();
   if (!source) return;
   window.__MD_RENDER_ORIGINAL__ = source;
+  // Snapshot the whole original body so restore() can bring back the browser's
+  // text/plain view faithfully (the <pre> and the inline styles it applies),
+  // not just the text content.
+  window.__MD_RENDER_ORIGINAL_HTML__ = document.body.innerHTML;
+  window.__MD_RENDER_ORIGINAL_BODY_STYLE__ = document.body.style.cssText;
 
   const html = md.render(source);
   const article = document.createElement('article');
@@ -87,5 +92,19 @@ function render() {
   document.documentElement.classList.add('md-render-active');
   window.__MD_RENDER_DONE__ = true;
 }
+
+function restore() {
+  if (!window.__MD_RENDER_DONE__) return; // nothing rendered to undo
+  // Write back the snapshotted body + inline styles. The background removes the
+  // injected theme CSS (insertCSS) separately via removeCSS.
+  document.body.innerHTML = window.__MD_RENDER_ORIGINAL_HTML__ || '';
+  document.body.style.cssText = window.__MD_RENDER_ORIGINAL_BODY_STYLE__ || '';
+  document.documentElement.classList.remove('md-render-active');
+  window.__MD_RENDER_DONE__ = false; // allow a fresh render afterwards
+}
+
+// Expose restore so the background can invoke it on the next manual trigger. It
+// runs in the same isolated world as this bundle, so the reference persists.
+window.__MD_RENDER_RESTORE__ = restore;
 
 render();

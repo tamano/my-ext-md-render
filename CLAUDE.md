@@ -36,12 +36,12 @@ test/render.test.mjs         [source] スモークテスト
 
 ## アーキテクチャと不変条件（壊さないこと）
 
-- **手動トリガのみ / activeTab のみ。** `background.js` は contextMenu クリックと action クリックで発火し、`chrome.scripting.executeScript` で `render.bundle.js` を現在のタブに注入する。`host_permissions` は使わない（クリック時だけ現在タブにアクセスする最小権限）。新機能でも broad なホスト権限は足さない。
+- **手動トリガのみ / activeTab のみ。** `background.js` は contextMenu クリックと action クリックで発火する。クリック時に `chrome.scripting.executeScript` でページ状態（`window.__MD_RENDER_DONE__`）を読み、未レンダリングなら `render.bundle.js` を注入、レンダリング済みなら復元する**トグル**。`host_permissions` は使わない（クリック時だけ現在タブにアクセスする最小権限）。新機能でも broad なホスト権限は足さない。`tabs.onActivated` / `tabs.onUpdated` はメニュー文言のリセット用で、`tabs` 権限なしで使える `tabId` / `changeInfo.status` のみに依存する（権限は増やさない）。
 - **ローカル完結。** 機微なドキュメント（例: ATS の候補者ファイル）を扱う前提。外部 CDN・外部サーバへの送信は禁止。`markdown-it` と `highlight.js` はバンドルに同梱、CSS は `node_modules` からコピー生成する。ネットワークアクセスを増やす変更はしない。
 - **`markdown-it` は `html: false`。** ソース中の生 HTML / スクリプトを描画させない安全装置。`true` にしない。
 - **テーマ CSS は `chrome.scripting.insertCSS`（拡張オリジン）で適用。** ページ側 CSP に妨げられないため。インライン `<style>` 注入には戻さない。
 - **テキスト取得は `<pre>`。** text/plain ページはブラウザが単一の `<pre>` に包む。`getSourceText()` は `body > pre` → `body.innerText` の順でフォールバック。
-- **1 ページ 1 回。** `window.__MD_RENDER_DONE__` で二重実行を防止。元テキストは `window.__MD_RENDER_ORIGINAL__` に退避（戻し機能を作るならここを使う）。
+- **二重実行防止と復元。** `window.__MD_RENDER_DONE__` で二重レンダリングを防止（トグルの状態判定にも使う）。レンダリング直前に元 `body` を `window.__MD_RENDER_ORIGINAL_HTML__`（innerHTML）と `window.__MD_RENDER_ORIGINAL_BODY_STYLE__`（`style.cssText`）へ退避し、`window.__MD_RENDER_RESTORE__()` で書き戻す。restore は `__MD_RENDER_DONE__` を `false` に戻すので再レンダリング可能。テーマ CSS は background 側で `removeCSS` する（注入スクリプトからは `chrome.scripting` を呼べないため）。元テキスト文字列は従来どおり `window.__MD_RENDER_ORIGINAL__` にも残す。
 
 ## よくある拡張作業
 
@@ -53,4 +53,5 @@ test/render.test.mjs         [source] スモークテスト
 
 - `view-source:` やブラウザ内部ページ（`brave://` 等）には注入不可。
 - 自動判定はしない方針。常に手動トリガ。
-- レンダリングの解除はページ再読込（F5）。
+- レンダリング解除は手動トリガのトグル（「元のテキストに戻す」）で行う。ページ再読込（F5）でも戻せる。
+- メニュー文言は global（タブ非依存）かつ activeTab はクリック時しか状態を読めないため、タブ切替・再読込時は既定文言にリセットする。文言は一時的に実状態とずれることがあるが、クリック時に実状態を再確認するので動作は常に正しい。

@@ -40,7 +40,8 @@ const dom = new JSDOM(
 const { window } = dom;
 
 const code = readFileSync(bundlePath, 'utf8');
-vm.runInContext(code, vm.createContext(window));
+const ctx = vm.createContext(window);
+vm.runInContext(code, ctx);
 
 const article = window.document.querySelector('article.markdown-body');
 assert.ok(article, 'rendered .markdown-body article should exist');
@@ -65,4 +66,34 @@ assert.equal(
   'no script elements from source',
 );
 
-console.log('OK: render smoke test passed');
+// Restore (the "undo" toggle): bring back the original text/plain <pre>.
+assert.equal(
+  typeof window.__MD_RENDER_RESTORE__,
+  'function',
+  'restore helper is exposed on window',
+);
+window.__MD_RENDER_RESTORE__();
+const restoredPre = window.document.querySelector('body > pre');
+assert.ok(restoredPre, 'original <pre> is restored');
+assert.equal(restoredPre.textContent, sample, 'restored text matches source');
+assert.equal(
+  window.document.querySelector('article.markdown-body'),
+  null,
+  'rendered article is removed on restore',
+);
+assert.equal(
+  window.document.documentElement.classList.contains('md-render-active'),
+  false,
+  'md-render-active class is removed on restore',
+);
+assert.equal(window.__MD_RENDER_DONE__, false, 'render guard flag is cleared');
+
+// Re-render after restore must work again (guard flag was reset).
+vm.runInContext(code, ctx);
+assert.ok(
+  window.document.querySelector('article.markdown-body'),
+  're-render after restore produces the article again',
+);
+assert.equal(window.__MD_RENDER_DONE__, true, 'render guard flag is set again');
+
+console.log('OK: render + restore smoke test passed');
