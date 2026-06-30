@@ -7,14 +7,21 @@
   "scripts": {
     "build:js": "esbuild src/render-entry.js --bundle --minify --format=iife --target=es2018 --outfile=ext/render.bundle.js",
     "build:css": "node scripts/build-css.mjs",
-    "build": "npm run build:js && npm run build:css",
+    "build:icons": "node scripts/build-icons.mjs",
+    "build": "npm run build:js && npm run build:css && npm run build:icons",
     "test": "node test/render.test.mjs",
     "package": "npm run build && cd ext && zip -rq ../my-ext-md-render.zip .",
-    "clean": "rm -f ext/render.bundle.js ext/vendor/github-markdown.css ext/vendor/hljs-github.css my-ext-md-render.zip"
+    "clean": "rm -f ext/render.bundle.js ext/vendor/github-markdown.css ext/vendor/hljs-github.css ext/icons/icon-16.png ext/icons/icon-32.png ext/icons/icon-48.png ext/icons/icon-128.png my-ext-md-render.zip"
   },
-  "keywords": ["markdown", "browser-extension", "chromium", "brave"],
+  "keywords": [
+    "markdown",
+    "browser-extension",
+    "chromium",
+    "brave"
+  ],
   "license": "MIT",
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "esbuild": "^0.28.1",
     "github-markdown-css": "^5.9.0",
     "highlight.js": "^11.11.1",
